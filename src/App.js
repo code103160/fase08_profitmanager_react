@@ -1,17 +1,72 @@
 import './style.css';
 import React from 'react';
+import $ from 'jquery';
+
 
 class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      lista : [
-        {id: '12', nome:'Thiafo', email: 'kermits@gmail.com'},
-        {id: '7', nome:'Lulu', email: 'luca@gmail.com'},
-        {id: '13', nome:'Vito', email: 'vitas@gmail.com'}
-      ]
+      lista : [],
+      name: '',
+      email: '',
+      password: '',
+      password_confirmation: '' 
     }
+    this.enviaForm = this.enviaForm.bind(this),
+    this.setName = this.setName.bind(this);
+    this.setEmail = this.setEmail.bind(this);
+    this.setPassword = this.setPassword.bind(this);
+    this.setPasswordConfirmation = this.setPasswordConfirmation.bind(this);
   }
+
+  enviaForm(evento) {
+    evento.preventDefault();
+    console.log("dados sendo enviados...");
+
+    $.ajax({
+      url: "https://profitmanager.onrender.com/api/v2/auth",
+
+      contentType: 'application/json',
+      dataType: 'json',
+      accept: "application/json",
+
+      type: 'post',
+      data: JSON.stringify(
+        {
+          name: this.state.name,
+          email: this.state.email,
+          password: this.state.password,
+          password_confirmation: this.state.password_confirmation
+        }
+      ),
+
+      success: function(resposta){
+        console.log("Sucesso!");
+        console.log(resposta);
+      },
+      complete: function(resposta){
+        console.log("Complete!!");
+      },
+      error: function(resposta){
+        console.log("Error...");
+      }
+    })
+  }
+
+  setName(evento){
+    this.setState( { name: evento.target.value } );
+  }
+  setEmail(evento){
+    this.setState( { email: evento.target.value } );
+  }
+  setPassword(evento){
+    this.setState( { password: evento.target.value } );
+  }
+  setPasswordConfirmation(evento){
+    this.setState( { password_confirmation: evento.target.value } );
+  }
+
   render() {
     return (
       <div>
@@ -72,22 +127,22 @@ class App extends React.Component {
               
               <div>						
                 <h1 class="h2">Cadastro de Usuários</h1>						
-                <form>
+                <form method="post" onSubmit={this.enviaForm}>
                   <div class="form-group">
                     <label for="formGroupExampleInput">Nome</label>
-                    <input type="text" class="form-control" id="name" name="name" value=""  placeholder="Nome"/>
+                    <input type="text" class="form-control" id="name" name="name" value={this.state.name} onChange={this.setName}  placeholder="Nome"/>
                   </div>
                   <div class="form-group">
                     <label for="formGroupExampleInput">E-mail</label>
-                    <input type="email" class="form-control" id="email" name="email" value=""  placeholder="E-mail"/>
+                    <input type="email" class="form-control" id="email" name="email" value={this.state.email} onChange={this.setEmail} placeholder="E-mail"/>
                   </div>
                   <div class="form-group">
                     <label for="formGroupExampleInput2">Senha</label>
-                    <input type="password" class="form-control" id="password" name="password" value="" placeholder="Senha"/>
+                    <input type="password" class="form-control" id="password" name="password" value={this.state.password} onChange={this.setPassword} placeholder="Senha"/>
                   </div>
                   <div class="form-group">
                     <label for="formGroupExampleInput2">Confirmar Senha</label>
-                    <input type="password" class="form-control" id="password_confirmation" name="password_confirmation" value="" placeholder="Confirme"/>
+                    <input type="password" class="form-control" id="password_confirmation" name="password_confirmation" value={this.state.password_confirmation} onChange={this.setPasswordConfirmation} placeholder="Confirme"/>
                   </div>
                   <button type="submit" class="btn btn-primary">Inscrever-se</button>
                 </form>						
