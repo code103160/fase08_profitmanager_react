@@ -1,7 +1,6 @@
 import './style.css';
 import React from 'react';
-
-
+import {UserForm, UserTable} from './User';
 
 class App extends React.Component {
 
@@ -63,36 +62,12 @@ class App extends React.Component {
               
               <br />
               
-              
+              <UserForm/>
   
               <br />
               
-              <div class="table-responsive">
-                <h2>Usuários</h2>
-                <table class="table table-striped table-sm">
-                  <thead>
-                    <tr>
-                      <th>ID</th>
-                      <th>Name</th>
-                      <th>E-mail</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {
-                      this.state.lista.map(function(user){
-                        return(
-                          <tr>
-                            <td>{user.id}</td>
-                            <td>{user.nome}</td>
-                            <td>{user.email}</td>
-                          </tr>
-                        );
-                      })
-                    }							
-                  </tbody>
-                </table>
-              </div>
-              
+              <UserTable/>
+
             </main>
             
           </div>

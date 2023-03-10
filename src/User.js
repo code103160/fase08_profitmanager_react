@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import $ from 'jquery';
 import InputCustomizado from './Components/InputCustomizado';
+import PubSub from 'pubsub-js';
 
 export class UserForm extends Component{
 
@@ -18,6 +19,8 @@ export class UserForm extends Component{
         this.setEmail = this.setEmail.bind(this);
         this.setPassword = this.setPassword.bind(this);
         this.setPasswordConfirmation = this.setPasswordConfirmation.bind(this);
+
+        this.guardaDados = {};
     }
 
     enviaForm(evento) {
@@ -44,10 +47,32 @@ export class UserForm extends Component{
           success: function(resposta){
             console.log("Sucesso!");
             console.log(resposta);
-          },
+
+            $.each(resposta.data,function(index,value){
+
+              this.guardaDados[index] = value;
+
+            }.bind(this));
+
+            setTimeout(function() {
+
+              var novaLista = this.state.lista;
+              novaLista.push(this.guardaDados);
+              //this.setState({lista:novaLista});
+
+              PubSub.publish('atualiza-lista-usuarios', novaLista);
+
+              this.guardaDados = {};
+
+            }.bind(this), 10);
+
+          }.bind(this),
+
           complete: function(resposta){
             console.log("Complete!!");
+            
           },
+
           error: function(resposta){
             console.log("Error...");
           }
@@ -93,6 +118,41 @@ export class UserForm extends Component{
 
 }
 
-export class UserTable extends Component{
-    a
+export class UserTable extends Component{ 
+
+  constructor() {
+    super();
+    this.state = {lista : []};
+  }
+
+  render(){
+    return(
+      <div class="table-responsive">
+        <h2>Usuários</h2>
+        <table class="table table-striped table-sm">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Name</th>
+              <th>E-mail</th>
+            </tr>
+          </thead>
+          <tbody>
+            {
+              this.state.lista.map(function(user){
+                return(
+                  <tr>
+                    <td>{user.id}</td>
+                    <td>{user.nome}</td>
+                    <td>{user.email}</td>
+                  </tr>
+                );
+              })
+            }							
+          </tbody>
+        </table>
+      </div> 
+    );
+  }
+
 }
