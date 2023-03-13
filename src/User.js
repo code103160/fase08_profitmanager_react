@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import $ from 'jquery';
 import InputCustomizado from './Components/InputCustomizado';
 import PubSub from 'pubsub-js';
+import ManageErrors from "./ManageErrors";
 
 export class UserForm extends Component{
 
@@ -61,6 +62,13 @@ export class UserForm extends Component{
               //this.setState({lista:novaLista});
 
               PubSub.publish('atualiza-lista-usuarios', novaLista);
+              alert("Cadastro efetuado com Sucesso!")
+              this.setState = {
+                name: '',
+                email: '',
+                password: '',
+                password_confirmation: '' 
+              }
 
               this.guardaDados = {};
 
@@ -70,13 +78,21 @@ export class UserForm extends Component{
 
           complete: function(resposta){
             console.log("Complete!!");
+            console.log(resposta.getAllResponseHeaders());
             
+            this.guardaDados.token = resposta.getResponseHeader('access-token');
+            this.guardaDados.client = resposta.getResponseHeader('client');
+            this.guardaDados.uid = resposta.getResponseHeader('uid');
           },
 
           error: function(resposta){
-            console.log("Error...");
+            
+            if(resposta.status === 422){
+              new ManageErrors().publishErrors(resposta.responseJSON);
+            }
+
           }
-        })
+        });
       }
     
       setName(evento){
@@ -123,6 +139,16 @@ export class UserTable extends Component{
   constructor() {
     super();
     this.state = {lista : []};
+  }
+
+  componentDidMount(){
+    PubSub.subscribe('atualiza-lista-usuarios', function(topico, novaLista){
+      this.setState({lista:novaLista});
+    }.bind(this))
+
+    PubSub.subscribe('erro-validacao', function(topico, erro){
+      alert(erro);
+    })
   }
 
   render(){
