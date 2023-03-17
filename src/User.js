@@ -1,74 +1,66 @@
-import React, { Component } from "react";
+import React, { useState, useEffect } from "react";
 import $ from 'jquery';
 import InputCustomizado from './Components/InputCustomizado';
 import PubSub from 'pubsub-js';
 import ManageErrors from "./ManageErrors";
 
-export class UserForm extends Component{
+export function UserForm() {
 
-    constructor(props) {
-        super(props);
-        this.state = {
-          lista : [],
+  const [lista, setLista] = useState([]);
+  const [nome, setNome] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [password_confirmation, setPasswordConfirmation] = useState('');
+  const [guardaDados, setGuardaDados] = useState({});
+
+
+  function enviaForm(evento) {
+    evento.preventDefault();
+    console.log("dados sendo enviados...");
+    
+    $.ajax({
+      url: "https://fase08profitmanager-production.up.railway.app/api/v2/auth",
+    
+      contentType: 'application/json',
+      dataType: 'json',
+      accept: "application/json",
+    
+      type: 'post',
+      data: JSON.stringify(
+        {
+          name: nome,
+          email: email,
+          password: password,
+          password_confirmation: password_confirmation
+        }
+      ),
+
+
+    
+      success: function(resposta){
+        console.log("Sucesso!");
+        console.log(resposta);
+
+        $.each(resposta.data,function(index,value){
+
+          guardaDados[index] = value;
+
+        });
+
+      setTimeout(function() {
+
+        var novaLista = this.state.lista;
+        novaLista.push(this.guardaDados);
+        //this.setState({lista:novaLista});
+
+        PubSub.publish('atualiza-lista-usuarios', novaLista);
+        alert("Cadastro efetuado com Sucesso!")
+        this.setState = {
           name: '',
           email: '',
           password: '',
           password_confirmation: '' 
         }
-        this.enviaForm = this.enviaForm.bind(this);
-        this.setName = this.setName.bind(this);
-        this.setEmail = this.setEmail.bind(this);
-        this.setPassword = this.setPassword.bind(this);
-        this.setPasswordConfirmation = this.setPasswordConfirmation.bind(this);
-
-        this.guardaDados = {};
-    }
-
-    enviaForm(evento) {
-        evento.preventDefault();
-        console.log("dados sendo enviados...");
-    
-        $.ajax({
-          url: "https://profitmanager.onrender.com/api/v2/auth",
-    
-          contentType: 'application/json',
-          dataType: 'json',
-          accept: "application/json",
-    
-          type: 'post',
-          data: JSON.stringify(
-            {
-              name: this.state.name,
-              email: this.state.email,
-              password: this.state.password,
-              password_confirmation: this.state.password_confirmation
-            }
-          ),
-    
-          success: function(resposta){
-            console.log("Sucesso!");
-            console.log(resposta);
-
-            $.each(resposta.data,function(index,value){
-
-              this.guardaDados[index] = value;
-
-            }.bind(this));
-
-            setTimeout(function() {
-
-              var novaLista = this.state.lista;
-              novaLista.push(this.guardaDados);
-              //this.setState({lista:novaLista});
-
-              PubSub.publish('atualiza-lista-usuarios', novaLista);
-              alert("Cadastro efetuado com Sucesso!")
-              this.setState = {
-                name: '',
-                email: '',
-                password: '',
-                password_confirmation: '' 
-              }
 
               this.guardaDados = {};
 
@@ -95,20 +87,6 @@ export class UserForm extends Component{
         });
       }
     
-      setName(evento){
-        this.setState( { name: evento.target.value } );
-      }
-      setEmail(evento){
-        this.setState( { email: evento.target.value } );
-      }
-      setPassword(evento){
-        this.setState( { password: evento.target.value } );
-      }
-      setPasswordConfirmation(evento){
-        this.setState( { password_confirmation: evento.target.value } );
-      }
-      
-    render() {
 
         return(
 
@@ -116,13 +94,13 @@ export class UserForm extends Component{
                 <h1 class="h2">Cadastro de Usuários</h1>						
                 <form method="post" onSubmit={this.enviaForm}>
                   
-                  <InputCustomizado type="text" id="name" name="name" value={this.state.name} onChange={this.setName} placeholder="Nome" label="Name"/>
+                  <InputCustomizado type="text" id="name" name="name" placeholder="Nome" label="Name" value={nome} onChange={e => setNome(e.target.value)}  />
 
-                  <InputCustomizado type="email" id="email" name="email" value={this.state.email} onChange={this.setEmail} placeholder="E-mail" label="E-mail"/>
+                  <InputCustomizado type="email" id="email" name="email" placeholder="E-mail" label="E-mail" value={email} onChange={e => setEmail(e.target.value)}/>
 
-                  <InputCustomizado type="password" id="password" name="password" value={this.state.password} onChange={this.setPassword} placeholder="Senha" label="Password"/>
+                  <InputCustomizado type="password" id="password" name="password" placeholder="Senha" label="Password" value={password} onChange={e => setPassword(e.target.value)}/>
 
-                  <InputCustomizado type="password" id="password_confirmation" name="password_confirmation" value={this.state.password_confirmation} onChange={this.setPasswordConfirmation} placeholder="Confirme a Senha" label="Password Confirmation"/>
+                  <InputCustomizado type="password" id="password_confirmation" name="password_confirmation" placeholder="Confirme a Senha" label="Password Confirmation" value={password_confirmation} onChange={e => setPasswordConfirmation(e.target.value)}/>
 
                   <button type="submit" class="btn btn-primary">Inscrever-se</button>
                 </form>						
