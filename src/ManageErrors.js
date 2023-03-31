@@ -8,4 +8,12 @@ export default class ManageErrors {
             PubSub.publish('erro-validacao', erro)
         }
     }
+
+    publishErrorsValidation(erros){
+        for (var i = 0; i < erros.errors.lenght; i++){
+            var erro = erros.errors[i];
+            console.log(erro);
+            PubSub.publish('erro-validacao', erro)
+        }
+    }
 }
