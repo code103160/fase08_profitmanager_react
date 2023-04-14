@@ -4,6 +4,7 @@ import './index.css';
 import App from './App';
 import UserBox from './User';
 import Home from'./Components/Home';
+import GainBox from './Gains';
 import reportWebVitals from './reportWebVitals';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Login from './Login';
@@ -19,6 +20,7 @@ root.render(
         <Route path='/' element={<Home/>}/>
         <Route path='/user' element={<UserBox/>}/>
         <Route path='/sign_in' element={<Login/>}/>
+        <Route path='/gains' element={<GainBox/>} />
       </Route>
     </Routes>
   </BrowserRouter>
